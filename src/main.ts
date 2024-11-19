@@ -11,9 +11,6 @@ import "vant/lib/index.css";
 // svg icon
 import "virtual:svg-icons-register";
 
-// 初始化
-import "./initialize";
-
 import App from "./App.vue";
 import router from "./router";
 
