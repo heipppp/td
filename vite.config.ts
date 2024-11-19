@@ -27,7 +27,11 @@ export default defineConfig(({ mode }) => {
       // vant 组件自动按需引入
       Components({
         dts: "src/typings/components.d.ts",
-        resolvers: [VantResolver()]
+        resolvers: [
+          VantResolver({
+            importStyle: false
+          })
+        ]
       }),
       // svg icon
       createSvgIconsPlugin({

@@ -1,18 +1,19 @@
 import Layout from "@/layout/index.vue";
+import SubLayout from "@/layout/sub.vue";
 import type { RouteRecordRaw } from "vue-router";
-import Demo from "@/views/demo/index.vue";
+import Home from "@/views/home/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "root",
     component: Layout,
-    redirect: { name: "Demo" },
+    redirect: { name: "Home" },
     children: [
       {
-        path: "demo",
-        name: "Demo",
-        component: Demo,
+        path: "home",
+        name: "Home",
+        component: Home,
         meta: {
           title: "主页"
         }
@@ -30,8 +31,32 @@ const routes: Array<RouteRecordRaw> = [
         name: "About",
         component: () => import("@/views/about/index.vue"),
         meta: {
-          title: "关于",
+          title: "设置",
           noCache: true
+        }
+      }
+    ]
+  },
+  {
+    path: "/setting",
+    name: "setting",
+    component: SubLayout,
+    redirect: { name: "Setting-site" },
+    children: [
+      {
+        path: "site",
+        name: "Setting-site",
+        component: () => import("@/views/about/site.vue"),
+        meta: {
+          title: "地址维护"
+        }
+      },
+      {
+        path: "site-view",
+        name: "Setting-view",
+        component: () => import("@/views/about/site-view.vue"),
+        meta: {
+          title: "地址查看"
         }
       }
     ]

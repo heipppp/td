@@ -6,8 +6,13 @@ import "normalize.css/normalize.css";
 import "./styles/index.less";
 // tailwindcss
 import "./styles/tailwind.css";
+// vant样式丢失
+import "vant/lib/index.css";
 // svg icon
 import "virtual:svg-icons-register";
+
+// 初始化
+import "./initialize";
 
 import App from "./App.vue";
 import router from "./router";
@@ -15,5 +20,4 @@ import router from "./router";
 const app = createApp(App);
 app.use(store);
 app.use(router);
-
 app.mount("#app");

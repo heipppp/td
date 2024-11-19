@@ -1,12 +1,15 @@
 import log from "./log";
 
-function get(key: string) {
+function get<T>(key: string, defaultValue = {}): T {
   try {
     const getI = localStorage.getItem(key);
+    if (!getI) {
+      return defaultValue as T;
+    }
     return JSON.parse(getI);
   } catch (e) {
     log(`存储信息转换错误: ${e}`, "error");
-    return {};
+    return defaultValue as T;
   }
 }
 

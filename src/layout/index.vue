@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import tabbar from "@/components/Tabbar/index.vue";
 import NavBar from "@/components/NavBar/index.vue";
+import Reserver from "@/components/Reserver/index.vue";
 import { useCachedViewStoreHook } from "@/store/modules/cachedView";
 import { useDarkMode } from "@/hooks/useToggleDarkMode";
 import { computed } from "vue";
@@ -14,6 +15,7 @@ const cachedViews = computed(() => {
   <div class="app-wrapper">
     <van-config-provider :theme="useDarkMode() ? 'dark' : 'light'">
       <nav-bar />
+      <reserver />
       <router-view v-slot="{ Component }">
         <keep-alive :include="cachedViews">
           <component :is="Component" />
