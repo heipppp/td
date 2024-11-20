@@ -27,3 +27,16 @@ export function fm_date(date: Date, format = "YYYY-MM-DD") {
 
   return format.replace(/(YYYY|MM|DD|HH|mm|ss)/g, match => map[match]);
 }
+
+export function fm_week(date: Date) {
+  const weekdays = [
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ];
+  return weekdays[date.getDay()];
+}

@@ -1,8 +1,7 @@
 import DayUtil from "@/utils/day";
-import mD from "@/config/minutedata";
 import storage from "@/utils/storage";
 import { reactive, toRefs } from "vue";
-import { fm_date, getWeek } from "@/utils/date";
+import { fm_date, fm_week, getWeek } from "@/utils/date";
 import type { ReserverType } from "@/types/cnf";
 
 export const useGenData = () => {
@@ -30,28 +29,26 @@ export const useGenData = () => {
 };
 
 function genday(today: Date) {
+  console.time("code");
   const du = new DayUtil(today);
-
   const weeks = du.getWeeks().map(e => {
     return {
       id: fm_date(e, "YYYYMMDD"),
-      text: fm_date(e, "MM月DD日")
+      text: fm_date(e, "MM月DD"),
+      wk: fm_week(e),
+      list: []
     };
   });
-  mD.forEach(e => (e.list.length = weeks.length));
-  const nMd = JSON.parse(JSON.stringify(mD));
-  const weekData = [];
-  weeks.forEach(e => {
-    storage.get<ReserverType[]>(e.id, []).forEach(se => weekData.push(se));
+  const tableData = weeks.map(e => {
+    e.list = storage.get<ReserverType[]>(e.id, []);
+    return e;
   });
 
-  weekData.forEach((e, i) => {
-    nMd[e.tKey].list[i] = e;
-  });
+  console.log(tableData);
+  console.timeEnd("code");
 
-  console.log(nMd);
   return {
-    tableData: nMd,
+    tableData,
     d1: du.monday,
     weeks: weeks
   };
