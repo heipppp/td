@@ -10,12 +10,11 @@ export type AreaAddressType = {
   area: string;
   text: string;
   value: string;
+  color: string;
 };
 
-export type ReserverType = {
-  day: string;
+export type CateType = {
   id: string;
-  site: string;
-  tKey: number;
-  time: string;
+  text: string;
+  value: string;
 };

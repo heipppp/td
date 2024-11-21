@@ -53,10 +53,27 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "site-view",
-        name: "Setting-view",
+        name: "Setting-site-view",
         component: () => import("@/views/about/site-view.vue"),
         meta: {
           title: "地址查看"
+        }
+      },
+
+      {
+        path: "category",
+        name: "Setting-category",
+        component: () => import("@/views/about/category.vue"),
+        meta: {
+          title: "类目维护"
+        }
+      },
+      {
+        path: "category-view",
+        name: "Setting-category-view",
+        component: () => import("@/views/about/category-view.vue"),
+        meta: {
+          title: "类目查看"
         }
       }
     ]

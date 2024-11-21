@@ -27,11 +27,24 @@ function del(idx: number, cdx: number) {
       >
         <template v-if="item.children && item.children.length > 0">
           <van-cell-group>
-            <van-cell
-              v-for="(c, cdx) in item.children"
-              :key="c.id"
-              :title="c.text"
-            >
+            <van-cell v-for="(c, cdx) in item.children" :key="c.id">
+              <!-- 使用 title 插槽来自定义标题 -->
+              <template #title>
+                <div class="flex gap-2 items-center">
+                  <div
+                    :style="{
+                      height: '10px',
+                      width: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: c.color
+                    }"
+                  />
+                  <div>
+                    {{ c.text }}
+                  </div>
+                </div>
+              </template>
+
               <template #right-icon>
                 <div @click="del(idx, cdx)">
                   <van-icon name="cross" color="red" />

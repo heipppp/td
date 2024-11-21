@@ -1,3 +1,5 @@
 export enum StorageEnum {
-  AREAKEY = "area"
+  AREAKEY = "area",
+  CATEGORYKEY = "category",
+  AREACOLORKEY = "areacolor"
 }

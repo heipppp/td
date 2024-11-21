@@ -1,55 +1,61 @@
 <script setup lang="ts">
-import { CSSProperties, ref } from "vue";
-import mdData from "@/config/minutedata";
-
-import { useGenData } from "@/hooks/useGenData";
+import { ref } from "vue";
 import { showNotify } from "vant";
+import { onDelTdI } from "@/hooks/useTodoHelp";
+import { useTodoStore } from "@/store/modules/todo";
+import { TodoItem } from "@/types/todo";
+import Todo from "@/components/Todo/index.vue";
 
-const { prev, next, weeks, tableData } = useGenData();
+const useTodo = useTodoStore();
+useTodo.genTds();
 
 defineOptions({
   name: "Demo"
 });
 
-const firstTableWidth = 80;
-const baseTableWidth = 80;
-
+const todoRef = ref();
 const visible = ref(false);
-
 const sheetVisible = ref(false);
-
+const activeTd = ref();
 const actions = ref([
   { name: "日期", disabled: true },
   { name: "地点", disabled: true },
   { name: "时间", disabled: true },
   { name: "时长", disabled: true },
+  { name: "类目", disabled: true },
+  { name: "编辑" },
   { name: "删除", color: "#ee0a24" }
 ]);
 
-const tableStyled = ref<CSSProperties>({
-  width: "100%",
-  tableLayout: "fixed",
-  borderCollapse: "collapse"
-});
-function openDialog() {
-  showNotify({ type: "success", message: "保存成功" });
-}
-
-function onOpenSheet(e: any) {
+function onOpenSheet(e: TodoItem) {
   actions.value[0].name = e.day;
   actions.value[1].name = e.site;
-  actions.value[2].name = e.time;
+  actions.value[2].name = `${e.stime} - ${e.etime}`;
   actions.value[3].name = `${e.diff * 10}分钟`;
+  actions.value[4].name = e.category;
   sheetVisible.value = true;
+  activeTd.value = e;
 }
 
-function onSelect() {
-  console.log(1);
+function onSelect({ name }: { name: "编辑" | "删除" }) {
+  if (name === "删除") {
+    const flg = onDelTdI(activeTd.value);
+    if (flg) {
+      showNotify({ type: "success", message: "删除成功" });
+      sheetVisible.value = false;
+    } else {
+      showNotify({ type: "danger", message: "有点小问题，删除失败了" });
+    }
+  } else {
+    sheetVisible.value = false;
+    setTimeout(() => todoRef.value.onOpenEdit(activeTd.value), 300);
+  }
 }
 </script>
 
 <template>
   <div class="h-full">
+    <Todo ref="todoRef" />
     <!-- dialog -->
     <div>
       <van-popup
@@ -68,42 +74,64 @@ function onSelect() {
       @select="onSelect"
     />
 
-    <div class="flex gap-2 justify-between p-2">
-      <van-button size="small" type="primary" @click="prev">上一周</van-button>
-      <van-button size="small" type="warning" @click="next">下一周</van-button>
+    <div
+      class="flex gap-2 justify-between p-2 border-b border-gray-100 bg-white"
+    >
+      <van-button
+        plain
+        size="small"
+        type="primary"
+        icon="arrow-left"
+        @click="useTodo.prev"
+        >前七天</van-button
+      >
+      <van-button
+        size="small"
+        plaintype="warning"
+        icon="arrow"
+        @click="useTodo.next"
+      />
     </div>
 
     <!-- Container -->
-    <div class="flex gap-2 text-xs text-center h-full">
-      <div
-        v-for="(t, idx) in tableData"
-        :key="t.id"
-        :class="[{ 'td-container-bg': idx % 2 === 0 }]"
-        class="flex-1"
-      >
-        <div>
-          <div>
-            {{ t.text }}
+    <div
+      class="flex text-xs text-center h-full border-l border-b scroll-y overflow-scroll"
+    >
+      <div v-for="t in useTodo.todos" :key="t.id" class="flex-1 border-r">
+        <van-sticky>
+          <div class="overflow-hidden bg-white py-2 border-b border-gray-100">
+            <div>
+              {{ t.text }}
+            </div>
+
+            <div>
+              <van-badge :content="t.list.length" :show-zero="false">
+                {{ t.wk }}
+              </van-badge>
+            </div>
           </div>
-          <div>
-            {{ t.wk }}
-          </div>
-        </div>
+        </van-sticky>
+
         <div class="flex gap-2 flex-col">
           <div
             v-for="d in t.list"
             :key="d.id"
-            class="rounded-md box-border"
+            class="rounded-md"
             :style="{
               height: `${d.diff * 2.5}vmin`,
               marginTop: `${d.top * 2.5}vmin`,
               backgroundColor: d.color,
+
               color: '#FFF'
             }"
             @click="onOpenSheet(d)"
           >
             <div>
-              {{ d.time }}
+              {{ d.stime }}
+            </div>
+
+            <div>
+              {{ d.etime }}
             </div>
 
             <div>
@@ -113,99 +141,9 @@ function onSelect() {
         </div>
       </div>
     </div>
-
-    <!-- <div class="overflow-y-scroll">
-      <div>
-        <table :style="tableStyled">
-          <colgroup>
-            <col :width="firstTableWidth" />
-            <col v-for="i in weeks.length" :key="i" :width="baseTableWidth" />
-          </colgroup>
-
-          <thead>
-            <tr>
-              <td class="table__sticky">
-                <div>时间</div>
-              </td>
-              <td v-for="d in weeks" :key="d.id">{{ d.text }}</td>
-            </tr>
-          </thead>
-        </table>
-      </div>
-
-      <div class="h-full">
-        <table :style="tableStyled" class="td-table">
-          <colgroup>
-            <col :width="firstTableWidth" />
-            <col v-for="i in weeks.length" :key="i" :width="baseTableWidth" />
-          </colgroup>
-
-          <tbody>
-            <tr v-for="(i, idx) in mdData" :key="i" class="td-table__row">
-              <td class="table__sticky">
-                <div v-if="idx % 3 === 0" class="cell">{{ i }}</div>
-              </td>
-
-              <td
-                v-for="(d, i) in weeks.length"
-                :key="i"
-                class="table__cell"
-                :class="[{ 'td-table__active': !!d }]"
-              >
-                <div v-if="d">
-                  {{ d }}
-                </div>
-                <div v-else class="cell">-</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div> -->
   </div>
 </template>
 
 <style scoped>
-.table__sticky {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.td-table {
-  border: 1px solid #e5e7eb;
-}
-
-.td-table__row {
-  border-bottom: 1px solid #ebeef5;
-}
-
-.table__cell {
-  min-width: 0;
-  box-sizing: border-box;
-  text-overflow: ellipsis;
-  position: relative;
-}
-
-.cell {
-  text-align: center;
-  box-sizing: border-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: normal;
-  overflow-wrap: break-word;
-  line-height: 23px;
-  padding: 0 12px;
-}
-
-.td-table__active {
-  background: red;
-}
-
 /*  */
-
-.td-container-bg {
-  /* background: #fff; */
-}
 </style>

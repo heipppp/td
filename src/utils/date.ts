@@ -40,3 +40,9 @@ export function fm_week(date: Date) {
   ];
   return weekdays[date.getDay()];
 }
+
+export function fm_list(date: Date) {
+  return [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(e =>
+    String(e)
+  );
+}
