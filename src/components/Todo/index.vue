@@ -55,6 +55,30 @@ const endfilter = (type: "hour" | "minute", options: any[]) => {
   }
 };
 
+const dayformatter = (type, option) => {
+  if (type === "year") {
+    option.text += "年";
+  }
+  if (type === "month") {
+    option.text += "月";
+  }
+  if (type === "day") {
+    option.text += "日";
+  }
+
+  return option;
+};
+
+const daytimeformatter = (type, option) => {
+  if (type === "hour") {
+    option.text += "时";
+  }
+  if (type === "minute") {
+    option.text += "分";
+  }
+  return option;
+};
+
 function onConfirm() {
   if (edit.value) {
     // 找时间
@@ -137,9 +161,17 @@ defineExpose({
         @confirm="onConfirm"
         @cancel="onCancel"
       >
-        <van-date-picker v-model="form.day" />
-        <van-time-picker v-model="form.startTime" :filter="filter" />
-        <van-time-picker v-model="form.endTime" :filter="endfilter" />
+        <van-date-picker v-model="form.day" :formatter="dayformatter" />
+        <van-time-picker
+          v-model="form.startTime"
+          :filter="filter"
+          :formatter="daytimeformatter"
+        />
+        <van-time-picker
+          v-model="form.endTime"
+          :filter="endfilter"
+          :formatter="daytimeformatter"
+        />
         <van-picker v-model="form.site" :columns="columns" />
         <van-picker v-model="form.category" :columns="categoryColumns" />
       </van-picker-group>
