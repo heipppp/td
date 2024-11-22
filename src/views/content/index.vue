@@ -38,6 +38,11 @@ function removeAllCache() {
       <van-cell title="类目维护" is-link clickable to="/setting/category" />
     </van-cell-group>
 
+    <TdTitle>内容新增</TdTitle>
+    <van-cell-group inset>
+      <van-cell title="批量安排" is-link clickable to="/operate/batch" />
+    </van-cell-group>
+
     <TdTitle>清除信息</TdTitle>
     <div class="td-panel">
       <van-button

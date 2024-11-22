@@ -4,20 +4,21 @@ import { showNotify } from "vant";
 import { onDelTdI } from "@/hooks/useTodoHelp";
 import { useTodoStore } from "@/store/modules/todo";
 import { TodoItem } from "@/types/todo";
+import { useTodoRef } from "@/hooks";
 import Todo from "@/components/Todo/index.vue";
 
 const useTodo = useTodoStore();
+const { todoRef, onUpdate, onAdd, onSumbit } = useTodoRef();
 useTodo.genTds();
 
 defineOptions({
   name: "Demo"
 });
 
-const todoRef = ref();
 const visible = ref(false);
 const sheetVisible = ref(false);
 const activeTd = ref();
-const actions = ref([
+const actions = ref<any>([
   { name: "日期", disabled: true },
   { name: "地点", disabled: true },
   { name: "时间", disabled: true },
@@ -26,6 +27,11 @@ const actions = ref([
   { name: "编辑" },
   { name: "删除", color: "#ee0a24" }
 ]);
+
+const offset = ref({
+  x: -1,
+  y: document.documentElement.clientHeight / 2
+});
 
 function onOpenSheet(e: TodoItem) {
   actions.value[0].name = e.day;
@@ -48,14 +54,17 @@ function onSelect({ name }: { name: "编辑" | "删除" }) {
     }
   } else {
     sheetVisible.value = false;
-    setTimeout(() => todoRef.value.onOpenEdit(activeTd.value), 300);
+    setTimeout(() => onUpdate(activeTd.value), 300);
   }
 }
 </script>
 
 <template>
-  <div class="h-full">
-    <Todo ref="todoRef" />
+  <div>
+    <!-- floatbar -->
+    <van-floating-bubble v-model:offset="offset" icon="plus" @click="onAdd" />
+
+    <Todo ref="todoRef" @on-handle-confirm="onSumbit" />
     <!-- dialog -->
     <div>
       <van-popup
@@ -70,13 +79,11 @@ function onSelect({ name }: { name: "编辑" | "删除" }) {
     <!-- sheet -->
     <van-action-sheet
       v-model:show="sheetVisible"
-      :actions="actions as any"
+      :actions="actions"
       @select="onSelect"
     />
 
-    <div
-      class="flex gap-2 justify-between p-2 border-b border-gray-100 bg-white"
-    >
+    <div class="flex gap-2 justify-between p-2 border-b border-gray-100 td-bg">
       <van-button
         plain
         size="small"
@@ -94,12 +101,10 @@ function onSelect({ name }: { name: "编辑" | "删除" }) {
     </div>
 
     <!-- Container -->
-    <div
-      class="flex text-xs text-center h-full border-l border-b scroll-y overflow-scroll"
-    >
+    <div class="flex text-xs text-center border-l border-b">
       <div v-for="t in useTodo.todos" :key="t.id" class="flex-1 border-r">
         <van-sticky>
-          <div class="overflow-hidden bg-white py-2 border-b border-gray-100">
+          <div class="overflow-hidden td-bg py-2 border-b border-gray-100">
             <div>
               {{ t.text }}
             </div>
@@ -112,11 +117,11 @@ function onSelect({ name }: { name: "编辑" | "删除" }) {
           </div>
         </van-sticky>
 
-        <div class="flex gap-2 flex-col">
+        <div class="flex flex-col">
           <div
             v-for="d in t.list"
             :key="d.id"
-            class="rounded-md"
+            class="rounded-md border border-gray-200 border-solid"
             :style="{
               height: `${d.diff * 2.5}vmin`,
               marginTop: `${d.top * 2.5}vmin`,
@@ -146,4 +151,8 @@ function onSelect({ name }: { name: "编辑" | "删除" }) {
 
 <style scoped>
 /*  */
+
+.td-bg {
+  background: var(--van-background-2);
+}
 </style>

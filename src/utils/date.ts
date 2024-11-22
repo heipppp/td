@@ -46,3 +46,41 @@ export function fm_list(date: Date) {
     String(e)
   );
 }
+
+export function fm_list_to_date(list: string[]) {
+  return new Date(list.join("-"));
+}
+
+export function get_betwwen(range: Date[]): Date[] {
+  // 解析开始和结束时间
+  const startDate = new Date(range[0]);
+  const endDate = new Date(range[1]);
+
+  // 确保开始日期在结束日期之前
+  if (startDate >= endDate) {
+    throw new Error("开始时间必须在结束时间之前");
+  }
+
+  const dates = []; // 存储每一天的 Date 对象
+  let currentDate = new Date(startDate);
+  currentDate.setHours(0, 0, 0, 0); // 将时间部分设置为 0，以确保只比较日期部分
+
+  // 循环添加每一天的 Date 对象到数组中
+  while (currentDate < endDate) {
+    dates.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1); // 增加一天
+  }
+  // 添加结束日期
+  dates.push(new Date(endDate));
+  return dates;
+}
+
+export function get_betwwen_week(range: Date[], week: number[]) {
+  const dkeystr = "YYYYMMDD";
+  const dates = get_betwwen(range);
+  return week.length == 6
+    ? dates.map(e => fm_date(e, dkeystr))
+    : dates
+        .filter(e => week.includes(e.getDay()))
+        .map(e => fm_date(e, dkeystr));
+}

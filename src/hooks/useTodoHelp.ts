@@ -1,4 +1,4 @@
-import type { TodoItem } from "@/types/todo";
+import type { TodoForm, TodoItem } from "@/types/todo";
 import storage from "@/utils/storage";
 import { generateUUID } from "@/utils/uid";
 import { showNotify } from "vant";
@@ -43,6 +43,20 @@ export function onAddTdI(td: TodoItem): boolean {
   }
 }
 
+export function onBatchAddTdI(td: TodoItem, days: string[]) {
+  const flag = !days
+    .map(e => storage.get(e, []) as TodoItem[])
+    .some(tds => !onHasTdI(td, tds));
+  if (flag) {
+    // 保存
+    for (let i in days) {
+      td.key = days[i];
+      onAddTdI(td);
+    }
+  }
+  return flag;
+}
+
 export function onDelTdI(td: TodoItem): boolean {
   const tds = storage.get(td.key, []) as TodoItem[];
   const idx = tds.findIndex(e => e.id === td.id);
@@ -73,10 +87,9 @@ export function onHasTdI(td: TodoItem, target: TodoItem[]): boolean {
         (e.etKey > td.stKey && e.stKey < td.etKey)
     ) !== -1
   ) {
-    showNotify({ type: "warning", message: "当前时间已被占用" });
+    showNotify({ type: "warning", message: "课程时间已被占用" });
     return false;
   }
-
   return true;
 }
 
@@ -111,13 +124,7 @@ export function genTdParams({
   endTime,
   site,
   category
-}: {
-  day: number[];
-  startTime: string[];
-  endTime: string[];
-  site: string[];
-  category: string[];
-}): TodoItem {
+}: TodoForm): TodoItem {
   const useColor = useColorHelp();
   return {
     id: generateUUID(),

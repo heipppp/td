@@ -1,5 +1,5 @@
 <template>
-  <van-tabbar v-model="active" :placeholder="true" :route="true" fixed>
+  <van-tabbar v-model="active" :placeholder="true" :route="true">
     <van-tabbar-item
       v-for="(item, index) in tabbarData"
       :key="index"
@@ -27,7 +27,7 @@ const tabbarData = reactive([
     icon: "ellipsis",
     title: "设置",
     to: {
-      name: "About"
+      name: "Content"
     }
   }
 ]);

@@ -1,20 +1,31 @@
 <script setup lang="ts">
-import { showNotify } from "vant";
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { StorageEnum } from "@/enums/storageKey";
-import { genTdParams, onAddTdI, onUpdateTdI } from "@/hooks/useTodoHelp";
 
 import storage from "@/utils/storage";
-import { TodoItem } from "@/types/todo";
-import { fm_list } from "@/utils/date";
+import { TodoForm } from "@/types/todo";
+import { fm_list_to_date } from "@/utils/date";
+
+const emits = defineEmits(["onHandleConfirm"]);
+const props = defineProps({
+  batch: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const activeTab = ref(0);
 const visible = ref(false);
-const edit = ref(false);
 
-const oform = ref<TodoItem>();
+const tabs = [
+  "选择日期",
+  "选择开始时间",
+  "选择结束时间",
+  "选择地点",
+  "选择类目"
+];
 
-const form = reactive({
+const form = ref<TodoForm>({
   category: [],
   site: [],
   day: [],
@@ -22,15 +33,12 @@ const form = reactive({
   endTime: []
 });
 
-const offset = ref({
-  x: -1,
-  y: document.documentElement.clientHeight / 2
-});
-
 const columns = computed<any[]>(() => storage.get(StorageEnum.AREAKEY, []));
 const categoryColumns = computed<any[]>(() =>
   storage.get(StorageEnum.CATEGORYKEY, [])
 );
+
+const minDate = new Date();
 
 const filter = (type: "hour" | "minute", options: any[]) => {
   if (type === "hour") {
@@ -44,7 +52,7 @@ const filter = (type: "hour" | "minute", options: any[]) => {
 
 const endfilter = (type: "hour" | "minute", options: any[]) => {
   if (type === "hour") {
-    const [s] = form.startTime;
+    const [s] = form.value.startTime;
     return options.filter(
       h => Number(h.value) >= Number(s) && Number(h.value) < 23
     );
@@ -79,102 +87,68 @@ const daytimeformatter = (type, option) => {
   return option;
 };
 
-function onConfirm() {
-  if (edit.value) {
-    // 找时间
-    const upf = onUpdateTdI(oform.value, genTdParams(form));
-    if (upf) {
-      showNotify({ type: "success", message: "修改成功" });
-      onCancel();
-    }
-  } else {
-    // 找时间
-    const adf = onAddTdI(genTdParams(form));
-    if (adf) {
-      showNotify({ type: "success", message: "添加成功" });
-      onCancel();
-    }
-  }
+// function
+function onOpen() {
+  visible.value = true;
 }
 
-function onCancel() {
-  oform.value = null;
+function onCancenel() {
   visible.value = false;
-  setTimeout(() => resetDateVal(), 300);
 }
 
-function onOpenPopup() {
-  edit.value = false;
-  visible.value = true;
+function getTodoVal() {
+  return form.value;
 }
 
-function onOpenEdit(old: TodoItem) {
-  edit.value = true;
-  form.day = old.oDay;
-  form.startTime = old.oSt;
-  form.endTime = old.oEt;
-  form.site = old.oSite;
-  form.category = old.oCate;
-  oform.value = old;
-  visible.value = true;
-}
-
-function resetDateVal() {
+function setTodoVal(val?: TodoForm) {
+  val && (form.value = val);
   activeTab.value = 0;
-  form.site = [];
-  form.startTime = ["12", "00"];
-  form.endTime = [];
-  form.category = [];
-  form.day = fm_list(new Date());
 }
 
-resetDateVal();
+function onConfirm() {
+  emits("onHandleConfirm");
+}
 
 defineExpose({
-  onOpenEdit
+  onOpen,
+  onCancenel,
+  getTodoVal,
+  setTodoVal
 });
 </script>
 
 <template>
-  <div>
-    <van-floating-bubble
-      v-model:offset="offset"
-      icon="plus"
-      @click="onOpenPopup"
-    />
-    <van-popup
-      v-model:show="visible"
-      position="bottom"
-      round
-      :style="{ padding: '8px' }"
+  <van-popup
+    v-model:show="visible"
+    position="bottom"
+    round
+    :style="{ padding: '8px' }"
+  >
+    <van-picker-group
+      v-model:active-tab="activeTab"
+      title="预定信息"
+      :tabs="props.batch ? tabs.slice(1, 5) : tabs"
+      @confirm="onConfirm"
+      @cancel="onCancenel"
     >
-      <van-picker-group
-        v-model:active-tab="activeTab"
-        title="预定信息"
-        :tabs="[
-          '选择日期',
-          '选择开始时间',
-          '选择结束时间',
-          '选择地点',
-          '选择类目'
-        ]"
-        @confirm="onConfirm"
-        @cancel="onCancel"
-      >
-        <van-date-picker v-model="form.day" :formatter="dayformatter" />
-        <van-time-picker
-          v-model="form.startTime"
-          :filter="filter"
-          :formatter="daytimeformatter"
-        />
-        <van-time-picker
-          v-model="form.endTime"
-          :filter="endfilter"
-          :formatter="daytimeformatter"
-        />
-        <van-picker v-model="form.site" :columns="columns" />
-        <van-picker v-model="form.category" :columns="categoryColumns" />
-      </van-picker-group>
-    </van-popup>
-  </div>
+      <van-date-picker
+        v-if="!props.batch"
+        v-model="form.day"
+        :formatter="dayformatter"
+        :min-date="new Date()"
+      />
+      <van-time-picker
+        v-model="form.startTime"
+        :filter="filter"
+        :formatter="daytimeformatter"
+      />
+      <van-time-picker
+        v-model="form.endTime"
+        :filter="endfilter"
+        :formatter="daytimeformatter"
+      />
+      <van-picker v-model="form.site" :columns="columns" />
+      <van-picker v-model="form.category" :columns="categoryColumns" />
+    </van-picker-group>
+  </van-popup>
 </template>

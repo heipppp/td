@@ -18,7 +18,7 @@ export interface TodoItem {
   category: string;
   // origin
   oCate: string[];
-  oDay: number[];
+  oDay: string[];
   oSite: string[];
   oSt: string[];
   oEt: string[];
@@ -29,4 +29,12 @@ export interface Todo {
   text: string;
   wk: string;
   list: TodoItem[];
+}
+
+export interface TodoForm {
+  category: string[];
+  site: string[];
+  day: string[];
+  startTime: string[];
+  endTime: string[];
 }

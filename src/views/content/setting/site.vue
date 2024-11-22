@@ -103,7 +103,7 @@ function genColor() {
       <template v-if="color">
         <TdTitle> 颜色展示 </TdTitle>
 
-        <div class="td-panel">
+        <div class="vant-pd-x">
           <div
             class="rounded-md p-2 text-white"
             :style="{
@@ -123,9 +123,3 @@ function genColor() {
     </van-form>
   </div>
 </template>
-
-<style scoped>
-.td-panel {
-  padding: 0 var(--van-padding-md);
-}
-</style>

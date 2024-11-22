@@ -1,7 +1,6 @@
 import Layout from "@/layout/index.vue";
 import SubLayout from "@/layout/sub.vue";
 import type { RouteRecordRaw } from "vue-router";
-import Home from "@/views/home/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -13,7 +12,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "home",
         name: "Home",
-        component: Home,
+        component: () => import("@/views/home/index.vue"),
         meta: {
           title: "主页"
         }
@@ -27,9 +26,9 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: "about",
-        name: "About",
-        component: () => import("@/views/about/index.vue"),
+        path: "content",
+        name: "Content",
+        component: () => import("@/views/content/index.vue"),
         meta: {
           title: "设置",
           noCache: true
@@ -46,7 +45,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "site",
         name: "Setting-site",
-        component: () => import("@/views/about/site.vue"),
+        component: () => import("@/views/content/setting/site.vue"),
         meta: {
           title: "地址维护"
         }
@@ -54,7 +53,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "site-view",
         name: "Setting-site-view",
-        component: () => import("@/views/about/site-view.vue"),
+        component: () => import("@/views/content/view/site-view.vue"),
         meta: {
           title: "地址查看"
         }
@@ -63,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "category",
         name: "Setting-category",
-        component: () => import("@/views/about/category.vue"),
+        component: () => import("@/views/content/setting/category.vue"),
         meta: {
           title: "类目维护"
         }
@@ -71,9 +70,26 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "category-view",
         name: "Setting-category-view",
-        component: () => import("@/views/about/category-view.vue"),
+        component: () => import("@/views/content/view/category-view.vue"),
         meta: {
           title: "类目查看"
+        }
+      }
+    ]
+  },
+
+  {
+    path: "/operate",
+    name: "Operate",
+    component: SubLayout,
+    redirect: { name: "Operate-batch" },
+    children: [
+      {
+        path: "batch",
+        name: "Operate-batch",
+        component: () => import("@/views/content/operate/batch.vue"),
+        meta: {
+          title: "批量安排"
         }
       }
     ]
