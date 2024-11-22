@@ -89,7 +89,15 @@ const routes: Array<RouteRecordRaw> = [
         name: "Operate-batch",
         component: () => import("@/views/content/operate/batch.vue"),
         meta: {
-          title: "批量安排"
+          title: "数据批量"
+        }
+      },
+      {
+        path: "export",
+        name: "Operate-export",
+        component: () => import("@/views/content/operate/export.vue"),
+        meta: {
+          title: "导入导出"
         }
       }
     ]
