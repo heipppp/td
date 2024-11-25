@@ -89,7 +89,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "Operate-batch",
         component: () => import("@/views/content/operate/batch.vue"),
         meta: {
-          title: "数据批量"
+          title: "批量插入"
         }
       },
       {

@@ -40,7 +40,7 @@ function removeAllCache() {
 
     <TdTitle>内容新增</TdTitle>
     <van-cell-group inset>
-      <van-cell title="数据批量" is-link clickable to="/operate/batch" />
+      <van-cell title="批量插入" is-link clickable to="/operate/batch" />
       <van-cell title="数据同步" is-link clickable to="/operate/export" />
     </van-cell-group>
 
