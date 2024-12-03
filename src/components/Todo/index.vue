@@ -135,7 +135,6 @@ defineExpose({
         v-if="!props.batch"
         v-model="form.day"
         :formatter="dayformatter"
-        :min-date="new Date()"
       />
       <van-time-picker
         v-model="form.startTime"
